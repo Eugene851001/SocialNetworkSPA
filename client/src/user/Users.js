@@ -18,7 +18,6 @@ class Users extends Component {
   componentDidMount() {
     getUsers()
 	  .then(response => {
-		console.log(response);
 	    this.setState({users: response.users});
 	  })
   }
@@ -29,7 +28,7 @@ class Users extends Component {
 	    <Header title={{name: "Пользователи"}}/>
 	    <Nav/>
 	    <article>
-			{this.state.users.map((user) => {return <User user={user} ket={user.userId}/>})}
+			{this.state.users?.map((user) => {return <User user={user} key={user.userId}/>})}
 		</article>
 		<Footer/>
 	  </div>

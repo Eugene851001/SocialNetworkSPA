@@ -1,26 +1,17 @@
 const express = require('express');
 const post = require('../controllers/post');
+const {requireSignin} = require('../controllers/auth');
 
 const postRouter = express.Router();
 
-postRouter.post('/create', function(request, response){
-  post.createPost(request, response);
-})
+postRouter.post('/create', requireSignin, post.createPost);
 
-postRouter.get('/posts', function(request, response){
-  post.showPosts(request, response);
-})
+postRouter.get('/posts', requireSignin, post.showPosts);
 
-postRouter.put('/like', function(request, response){
-  post.like(request, response);
-});
+postRouter.put('/like', requireSignin, post.like);
 
-postRouter.put('/unlike', function(request, response) {
-  post.unlike(request, response);
-});
+postRouter.put('/unlike', requireSignin, post.unlike);
 
-postRouter.delete('/:postId/delete', function(request, response) {
-  post.delete(request, response);
-})
+postRouter.delete('/:postId/delete', requireSignin, post.delete);
 
 module.exports = postRouter;

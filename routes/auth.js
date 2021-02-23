@@ -12,7 +12,7 @@ authRouter.post('/signin', function(request, response){
   auth.postSignin(request, response);
 });
 
-authRouter.get('/signout', function(request, response){
+authRouter.put('/signout', function(request, response){
   auth.signout(request, response);
 });
 

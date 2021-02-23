@@ -28,7 +28,7 @@ export const follow = (userId) => {
       Accept: 'application/json',
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({userId})
+    body: JSON.stringify({userId}),
   }).then(response => response.json());
 }
 

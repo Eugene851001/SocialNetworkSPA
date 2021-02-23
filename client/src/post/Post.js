@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import {likePost, unlikePost, deletePost} from './apiPost'
-import Cookies from 'js-cookie'
+import {Redirect} from 'react-router-dom'
 
 class Post extends Component {
 
@@ -10,13 +10,14 @@ class Post extends Component {
 	this.state = {
 	  postId: props.post.postId,
 	  authorName: props.post.authorName,
-	  authorId: props.post.authorId,
+	  myPost: props.post.myPost,
 	  description: props.post.description,
 	  date: props.post.date,
 	  photo: props.post.photo,
 	  likes: props.post.likes,
 	  like: props.post.like,
 	  redirect: false,
+	  redirectToLogination: false,
 	}
 	
 	this.onLike = this.onLike.bind(this);
@@ -33,6 +34,11 @@ class Post extends Component {
 	
 	likePost(this.state.postId)
 	  .then(response => {
+		if (response.err) {
+		  this.setState({redirectToLogination: true})
+		  return
+		}
+
 	    this.setState({
 		  likes: response.likes,
 		  like: response.like,
@@ -49,6 +55,11 @@ class Post extends Component {
 
 	unlikePost(this.state.postId)
 	  .then(response => {
+		  if (response.err) {
+		    this.setState({redirectToLogination: true});
+			return;
+		  }
+
 		  this.setState({
 			  likes: response.likes,
 			  like: response.like
@@ -66,8 +77,7 @@ class Post extends Component {
   }
   
   render() {
-	let userId = Cookies.get('userId').split('"')[1];
-	let {authorName, description, date, likes, photo} = this.state;
+	let {authorName, description, date, likes, photo, myPost} = this.state;
 	const buttonLike = <button className="button-like" onClick={this.onLike}>Likes {likes}</button>;
 	const buttonUnlike = <button className="button-unlike" onClick={this.onUnlike}>Likes {likes}</button>;
 	const buttonDelete = <button onClick={this.onDelete}>Удалить</button>;
@@ -79,11 +89,12 @@ class Post extends Component {
 					<img className ="post-image" src={photo} width="480" height="320" />
 					<p>
 						{this.state.like ? buttonUnlike : buttonLike}
-						{userId == this.state.authorId ? buttonDelete : ''}
+						{myPost ? buttonDelete : ''}
 					</p>
 				</div>;
     return (
       <div>
+		  {this.state.redirectToLogination ? <Redirect to="/Logination"/> : ''}
 		  {this.state.redirect ? '' : body}
 	  </div>
     );

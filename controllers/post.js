@@ -199,7 +199,7 @@ function showPosts(request, response) {
 			  return {
 				  postId: post._id,
 				  authorName: post.author.name,
-				  authorId: post.author._id,
+				  myPost: post.author._id == request.cookies.userId,
 				  description: post.description,
 				  date: post.date,
 				  photo: 'uploads/' + post.image,

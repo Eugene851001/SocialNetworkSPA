@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const multer = require('multer');
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 const authRouter = require('./routes/auth.js');
@@ -30,12 +31,28 @@ const filter = function(request, file, cb) {
 	}
 }
 
-app.set("view engine", "ejs");
 app.use(express.static(__dirname + "/public"));
 app.use(multer({dest:"public/uploads", fileFilter: filter}).single("filedata"));
 app.use(parserJson);
 app.use(cookieParser()); 
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use((request, response, next) => {
+  request.cookies.userId = undefined;
+  if (request.cookies.token) {
+    let clientToken = request.cookies.token;
+    jwt.verify(clientToken, process.env.JWT_KEY, (err, payload) => {
+      if (err) {
+        console.log(err);
+        next();
+      }
+
+      request.cookies.userId = payload.userId;
+      next();
+    })
+  } else {
+    next();
+  }
+})
 
 app.use('/', authRouter);
 app.use('/user', userRouter);

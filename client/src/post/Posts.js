@@ -4,6 +4,7 @@ import Nav from '../Nav'
 import Header from '../Header'
 import Footer from '../Footer'
 import {getPosts, createPost} from './apiPost'
+import {Redirect} from 'react-router-dom'
 
 class Posts extends Component {
 
@@ -12,6 +13,7 @@ class Posts extends Component {
 
         this.state = {
             posts: [],
+			redirect: false,
         }
 		
 		this.onSubmit = this.onSubmit.bind(this);
@@ -23,6 +25,11 @@ class Posts extends Component {
 	  e.preventDefault();
 	  createPost(this.postData)
 	    .then(response => {
+		  if (response.err) {
+            this.setState({redirect: true});   
+			return;
+		  }
+
 		  this.setState({posts: response.posts});
 		});
 	}
@@ -44,6 +51,11 @@ class Posts extends Component {
                 console.log('Can not get response');
                 return;
             }
+
+			if (response.err) {
+				this.setState({redirect: true});
+				return;
+			} 
             
 			console.log(response.posts);
             this.setState({posts: response.posts});
@@ -53,6 +65,7 @@ class Posts extends Component {
     render(){
       return (
         <div className="grid-container">
+			{this.state.redirect ? <Redirect to="/Logination"/> : ''}
 			<Header title={{name: "Посты"}}/>
 			<Nav/>
 			<article>

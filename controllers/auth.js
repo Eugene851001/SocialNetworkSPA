@@ -1,8 +1,10 @@
 const NOT_READY = 'Not ready';
 const User = require('../models/user');
+const jwt = require('jsonwebtoken');
 
 exports.signout = (request, response) => {
-  response.clearCookie('userId');
+  console.log('Signed out');
+ // response.clearCookie('token');
   response.json();
 }
 
@@ -26,8 +28,7 @@ exports.postSignup = (request, response) => {
 	    console.log(err);
 	    response.status(500).json({err: 'Can not registrate'});
 	  } else {
-        response.cookie('userId', user._id);
-		response.json({userId: user._id});
+	    authorize(response, user)
 	  }
     }); 
   });
@@ -38,10 +39,26 @@ exports.postSignin = (request, response) => {
   User.findOne({login, password}, function(err, user){
     if (err || !user) {
 	  console.log('User not found');
-	  response.status(501).json({err: 'User not found'});
+	  response.status(404).json({err: 'User not found'});
 	} else {
-	  response.cookie('userId', user._id);
-      response.status(200).json({user: user});
+	  authorize(response, user)
 	}
   });
-};
+}
+
+function authorize(response, user) {
+	let token = jwt.sign({userId: user._id}, process.env.JWT_KEY);
+	let maxAge = 60 * 10
+	response.setHeader('Set-Cookie', `token=${token}; max-age=${maxAge}; HttpOnly`);
+    response.status(200).json({
+	  user: user,
+	});
+}
+
+exports.requireSignin = (request, response, next) => {
+  if (request.cookies.userId) {
+    next();
+  } else {
+    response.status(401).json({err: 'Please, log in'});
+  }
+}

@@ -15,10 +15,16 @@ export const signup = (user) => {
   return fetch('/signup', {
     method: 'POST',
     headers: {
-      headers: 'Application/json',
+      Accept: 'Application/json',
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(user)
   }).then(res => res.json())
   .catch(err => console.log(err));
+}
+
+export const signout = () => {
+  return fetch('/signout', {
+    method: 'PUT',
+  })
 }

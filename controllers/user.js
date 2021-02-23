@@ -44,6 +44,9 @@ exports.getUser = function(request, response) {
   console.log('Getting user');
   console.log(request.params);
   let userId = request.params['userId'];
+  if (userId === 'me') {
+	  userId = request.cookies.userId;
+  }
   User.findById(userId)
 	.exec(function(err, user){
       if (err) {
@@ -82,11 +85,6 @@ exports.showUsers = function(request, response) {
 	  return;
 	}
 	
-	if (request.cookies === undefined || request.cookies.userId === undefined) {
-	  response.status(401).json({err: NEED_LOG_IN});
-	  return;
-	}
-	
 	let usersToSend = users.map((user) => {
 	  return {
 	    name: user.name,
@@ -100,6 +98,10 @@ exports.showUsers = function(request, response) {
 
 exports.getFollowing = function(request, response) {
   let userId = request.params['userId'];
+  if (userId == 'me') {
+    userId = request.cookies.userId;
+  }
+
   console.log('Try get following');
   User.findOne({_id: userId}, function(err, user){
 	if (err) {
@@ -124,6 +126,10 @@ exports.getFollowing = function(request, response) {
 
 exports.getFollowers = function(request, response) {
   let userId = request.params['userId'];  
+  if (userId == 'me') {
+    userId = request.cookies.userId;
+  }
+
   console.log('Try get followers');
   console.log(request);
   User.findById(userId, function(err, user){
@@ -147,11 +153,6 @@ exports.getFollowers = function(request, response) {
 }
 
 exports.addFollowing = function(request, response) {
-  
-  if (request.cookies === undefined || request.cookies.userId === undefined) {
-    response.status(401).json({err: NEED_LOG_IN});
-	return;
-  }
 
   let userId = request.body.userId;
   
@@ -212,6 +213,7 @@ exports.addFollower = function(request, response, next) {
 	  if (err) {
 	    console.log(err);
 	    response.status(500).send();
+		return;
 	  }
 	  
 	  next();
@@ -230,6 +232,7 @@ exports.removeFollower = function(request, response, next) {
 	  if (err) {
 	    console.log(err);
 		response.status(500).send();
+		return;
 	  }
 	  
 	  next();
